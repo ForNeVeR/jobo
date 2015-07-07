@@ -4,6 +4,7 @@ extern crate winapi;
 use std::ptr;
 use winapi::*;
 
+mod command_line;
 mod string;
 
 fn main() {
@@ -19,19 +20,7 @@ fn main() {
             panic!("AssignProcessToJobObject error: {}", kernel32::GetLastError());
         }
 
-        let command_line = kernel32::GetCommandLineW();
-        let output = kernel32::GetStdHandle(winbase::STD_OUTPUT_HANDLE);
-        let mut written: DWORD = 0;
-        let writeResult = kernel32::WriteConsoleW(
-            output,
-            command_line as *const std::os::raw::c_void,
-            kernel32::lstrlenW(command_line) as u32,
-            &mut written,
-            ptr::null_mut()
-        );
-        if writeResult == 0 {
-            panic!("WriteConsoleW error: {}", kernel32::GetLastError());
-        }
+        let command_line = command_line::get_arguments();
 
         // TODO: CreateProcess
         // TODO: WaitForSingleObject
